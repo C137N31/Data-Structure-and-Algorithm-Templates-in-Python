@@ -229,8 +229,8 @@ class LinkedList:
         return nextHead
 
 class DLinkedListNode:      # doubly linked list
-    def __init__(self, key=0):
-        self.val = key
+    def __init__(self, val=0):
+        self.val = val
         self.prev = self.next = None
 
 class DLinkedList:
@@ -254,8 +254,8 @@ class DLinkedList:
         if self.size == 0: return None
         self.size -= 1
         if not node: node = self.tail.prev
-        prev, nxt = node.prev, node.next
-        prev.next, nxt.prev = nxt, prev
+        prev, next = node.prev, node.next
+        prev.next, next.prev = next, prev
         return node
 
 class DirectedGraphNode:        # for topological sorting
@@ -318,13 +318,14 @@ class UndirectedGraph:
         djs = DisjointSet(nodeCount)
         edges.sort()    # by weight
         for weight, u, v in edges:
-            if djs.union(u,v):
-                result += weight
+            if djs.joint(u,v): continue
+            djs.union(u,v)
+            result += weight
         return result
 
 class DisjointSet:
     def __init__(self, n):
-        self.count = 0
+        self.count = 0      # disjoint sets count
         self.root = [-1] * n
         self.size = [0] * n
 
@@ -356,7 +357,7 @@ class DisjointSet:
             self.root[a] = self.find(self.root[a])
         return self.root[a]
 
-    def connected(self, a, b):
+    def joint(self, a, b):
         return self.find(a) == self.find(b)
 
 class Sort:
@@ -399,7 +400,7 @@ class Sort:
     def mergeSortBottomUP(self, nums):
         interval = 1
         while interval < len(nums):
-            for start in range(0, len(nums), 2*interval):
+            for start in range(0, len(nums)-interval, 2*interval):
                 self.mergeBottomUP(nums, start, interval)
             interval *= 2
 
@@ -448,6 +449,8 @@ class Match:    # string match pattern
         self.s = string
         self.p = pattern
         self.next = [0] * (len(pattern) + 1)    # longest (prefix == suffix) of p[:i] 
+
+        self.buildPattern()
 
     def buildPattern(self, pattern=None): 
         j = 0
