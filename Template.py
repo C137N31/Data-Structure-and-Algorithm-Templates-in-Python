@@ -174,6 +174,60 @@ class ListNode:     # singly linked list
         self.val = val
         self.next = next
 
+    def __len__(self):
+        result = 0
+        node = self
+        while node:
+            result += 1
+            node = node.next
+        return result
+    
+    def getMid(self):
+        slow, fast = self, self
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        return slow
+
+    def reverse(self):
+        prev, curr = None, self
+        while curr:
+            temp = curr.next
+            curr.next = prev
+            prev, curr = curr, temp
+        return prev
+
+class LinkedList:
+    def __init__(self, head):
+        self.head = head
+
+    def merge(self, head1, head2):  
+        tail = dummy = ListNode()
+        while head1 and head2:
+            if head1.val < head2.val:
+                tail.next = head1
+                head1 = head1.next
+            else:
+                tail.next = head2
+                head2 = head2.next
+            tail = tail.next
+        
+        tail.next = head1 if head1 else head2
+        while tail.next: 
+            tail = tail.next
+
+        return (dummy.next, tail)   # return (head, tail) of merged list
+
+    def split(self, head, length):
+        node = head
+        while node and length > 1:
+            node = node.next
+            length -= 1
+        
+        nextHead = node.next if node else None  # head of next list
+        if node: node.next = None   # cut current list
+        return nextHead
+
 class DLinkedListNode:      # doubly linked list
     def __init__(self, key=0):
         self.val = key
