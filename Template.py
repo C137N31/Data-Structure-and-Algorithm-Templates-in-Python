@@ -7,11 +7,6 @@ from functools import lru_cache
 import random
 import typing
 
-class ListNode:     # singly linked list
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
-
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
@@ -173,6 +168,11 @@ class Trie:
             return len(node.children) == 0
         
         return False
+
+class ListNode:     # singly linked list
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
 
 class DLinkedListNode:      # doubly linked list
     def __init__(self, key=0):
