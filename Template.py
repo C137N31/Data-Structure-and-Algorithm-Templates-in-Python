@@ -503,31 +503,47 @@ class Match:    # string match pattern
                 j = self.next[j]
         return result
 
-    def matchRabinKarp(self):
+    def matchRabinKarp(self, m):    # find duplicate substring's starting index. substring length = m
         # change string to numbers for computing
         s = [ord(c)-ord('a') for c in self.s]
-        p = [ord(c)-ord('a') for c in self.p]
-        n, m = len(s), len(p)
+        n = len(s)
+        # choose one set of base and modular for hash function
+        a = 26
+        mod = 10**9+7
+        aL = pow(a, m, mod)
+        # calculate starting substring's hash value
+        h = 0
+        for i in range(m):
+            h = (h*a + s[i]) % mod
+        seen = defaultdict(list)    # chaining to solve collision
+        seen[h].append(0)
+        # calculate string's sliding window  hash value (window length = m)
+        result = []
+        for i in range(1, n-m+1):
+            h = (h*a - s[i-1]*aL + s[i+m-1]) % mod
+            if h in seen and any(s[i:i+m] == s[j:j+m] for j in seen[h]):
+                result.append(i)
+            else: seen[h].append(i)
+        
+        return result
+
+    def matchRabinKarp2(self, m):
+        # change string to numbers for computing
+        s = [ord(c)-ord('a') for c in self.s]
+        n = len(s)
         # choose one set of base and modular for hash function
         # to avoid hash collision, we may choose two or more sets of bases and modulars 
         a1, a2 = random.randint(26,100), random.randint(26,100)
         mod1, mod2 = random.randint(10**9+7,2**31-1), random.randint(10**9+7,2**31-1)
         aL1, aL2 = pow(a1, m, mod1), pow(a2, m, mod2)
-        # calculate pattern's hash value
-        ph1, ph2 = 0, 0
-        for i in range(m):
-            ph1 = (ph1*a1 + p[i]) % mod1
-            ph2 = (ph2*a2 + p[i]) % mod2
-        seen = {(ph1, ph2)}
-        # calculate string's sliding window  hash value (window length = pattern length)
-        result = []
+        # calculate starting substring's hash value
         h1, h2 = 0, 0
         for i in range(m):
             h1 = (h1*a1 + s[i]) % mod1
             h2 = (h2*a2 + s[i]) % mod2
-        if (h1, h2) in seen: result.append(0)
-        else: seen.add((h1, h2))
-        # slide window
+        seen = {(h1, h2)}
+        # calculate string's sliding window  hash value (window length = pattern length)
+        result = []
         for i in range(1, n-m+1):
             h1 = (h1*a1 - s[i-1]*aL1 + s[i+m-1]) % mod1
             h2 = (h2*a2 - s[i-1]*aL2 + s[i+m-1]) % mod2
