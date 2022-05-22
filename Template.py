@@ -50,6 +50,20 @@ class TreeNode:
                     result.append(curr.val)
                     prev, curr = curr, None
 
+    def buildBST(self, node):   # build binary search tree by adding node
+        if node.val < self.val:
+            if not self.left:
+                self.left = node
+                return True
+            return self.left.buildBST(node)
+        elif node.val > self.val:
+            if not self.right:
+                self.right = node
+                return True
+            return self.right.buildBST(node)
+        else:
+            return False
+    
     def solve1(self, root):
         if not root: return -1 # or something
         # if func0(root): return something
@@ -301,12 +315,14 @@ class UndirectedGraph:
             self.graph[u].append((weight,v))
             self.graph[v].append((weight,u))
 
-    def prim(self, start):      # for MST: minimum spanning tree
+    # Prim algorithm is Dijkstra algorithm
+    def prim(self, nodeCount, start):      # for MST: minimum spanning tree
         result = 0
         visit = set()
         minHeap = [(0, start)]
-        while minHeap:
+        while len(visit) < nodeCount:   # while minHeap:
             weight, u = heappop(minHeap)
+            if u in visit: continue
             result += weight
             visit.add(u)
             for weight, v in self.graph[u]:
@@ -366,7 +382,8 @@ class Sort:
 
     def quickSort(self, nums, start, end):  # nums[start:end+1]
         if start >= end: return
-        pivot = nums[random.randint(start,end)]
+        pivotIndex = random.randint(start,end)
+        pivot = nums[pivotIndex]
         l, r = start, end
         while l <= r:
             while l <= r and nums[l] < pivot: l += 1
@@ -377,6 +394,22 @@ class Sort:
                 r -= 1
         self.quickSort(nums, start, r)
         self.quickSort(nums, l, end)
+
+    def quickSelect(self, nums, start, end, k):     # select first k smallest nums
+        if start >= end: return nums[:k]
+        pivotIndex = random.randint(start,end)
+        pivot = nums[pivotIndex]
+        l, r = start, end
+        while l <= r:
+            while l <= r and nums[l] < pivot: l += 1
+            while l <= r and nums[r] > pivot: r -= 1
+            if l <= r:
+                nums[l], nums[r] = nums[r], nums[l]
+                l += 1
+                r -= 1
+        if   l > k: return self.quickSelect(nums, start, r, k)
+        elif l < k: return self.quickSelect(nums, l, end, k)
+        else:       return nums[:k]
 
     def mergeSortTopDown(self, nums):
         if len(nums) < 2: return
