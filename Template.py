@@ -481,11 +481,9 @@ class Match:    # string match pattern
     def __init__(self, string=None, pattern = None):
         self.s = string
         self.p = pattern
-        self.next = [0] * (len(pattern) + 1)    # longest (prefix == suffix) of p[:i] 
 
-        self.buildPattern()
-
-    def buildPattern(self, pattern=None): 
+    def buildPattern(self): 
+        self.next = [0] * (len(self.p) + 1)    # longest (prefix == suffix) of p[:i] 
         j = 0
         for i in range(1, len(self.p)):
             while j > 0 and self.p[i] != self.p[j]: j = self.next[j]
@@ -493,14 +491,49 @@ class Match:    # string match pattern
             self.next[i+1] = j
         return self.next
 
-    def kmpMatch(self, string=None, pattern=None):    # all starting index of substring matching pattern
+    def matchKMP(self, string=None, pattern=None):    # all starting index of substring matching pattern
         self.buildPattern()
         result = []
         j = 0
         for i in range(len(self.s)):
             while j > 0 and self.s[i] != self.p[j]: j = self.next[j]
             if self.s[i] == self.p[j]: j += 1
-            if j == len(self.p): result.append(i-j+1)
+            if j == len(self.p): 
+                result.append(i-j+1)
+                j = self.next[j]
+        return result
+
+    def matchRabinKarp(self):
+        # change string to numbers for computing
+        s = [ord(c)-ord('a') for c in self.s]
+        p = [ord(c)-ord('a') for c in self.p]
+        n, m = len(s), len(p)
+        # choose one set of base and modular for hash function
+        # to avoid hash collision, we may choose two or more sets of bases and modulars 
+        a1, a2 = random.randint(26,100), random.randint(26,100)
+        mod1, mod2 = random.randint(10**9+7,2**31-1), random.randint(10**9+7,2**31-1)
+        aL1, aL2 = pow(a1, m, mod1), pow(a2, m, mod2)
+        # calculate pattern's hash value
+        ph1, ph2 = 0, 0
+        for i in range(m):
+            ph1 = (ph1*a1 + p[i]) % mod1
+            ph2 = (ph2*a2 + p[i]) % mod2
+        seen = {(ph1, ph2)}
+        # calculate string's sliding window  hash value (window length = pattern length)
+        result = []
+        h1, h2 = 0, 0
+        for i in range(m):
+            h1 = (h1*a1 + s[i]) % mod1
+            h2 = (h2*a2 + s[i]) % mod2
+        if (h1, h2) in seen: result.append(0)
+        else: seen.add((h1, h2))
+        # slide window
+        for i in range(1, n-m+1):
+            h1 = (h1*a1 - s[i-1]*aL1 + s[i+m-1]) % mod1
+            h2 = (h2*a2 - s[i-1]*aL2 + s[i+m-1]) % mod2
+            if (h1, h2) in seen: result.append(i)
+            else: seen.add((h1, h2))
+
         return result
 
 print("Fan's Data Structures and Algorithms")
