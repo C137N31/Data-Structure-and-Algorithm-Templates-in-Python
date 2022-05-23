@@ -50,6 +50,73 @@ class TreeNode:
                     result.append(curr.val)
                     prev, curr = curr, None
 
+    def preorderMorris(self, result):
+        prev, curr = None, self
+        while curr:
+            if not curr.left:
+                result.append(curr.val)
+                curr = curr.right
+            else:
+                prev = curr.left
+                while prev.right and prev.right != curr:
+                    prev = prev.right
+                if not prev.right:      # append curr to its predecessor, which means curr is the successor
+                    result.append(curr.val)
+                    prev.right, curr = curr, curr.left
+                else:                   # find saved successor at right child
+                    prev.right, curr = None, curr.right
+
+    def inorderMorris(self, result):
+        prev, curr = None, self
+        while curr:
+            if not curr.left:
+                result.append(curr.val)
+                curr = curr.right
+            else:
+                prev = curr.left
+                while prev.right and prev.right != curr:
+                    prev = prev.right
+                if not prev.right:      # append curr to its predecessor, which means curr is the successor
+                    prev.right, curr = curr, curr.left
+                else:                   # find saved successor at right child
+                    result.append(curr.val)
+                    prev.right, curr = None, curr.right
+
+    def postorderMorris(self, result):
+        prev = None
+        curr = dummy = TreeNode(0,self)
+        while curr:
+            if not curr.left:
+                curr = curr.right
+            else:
+                prev = curr.left
+                while prev.right and prev.right != curr:
+                    prev = prev.right
+                if prev.right:
+                    self._outputReverse(curr.left, prev, result)
+                    prev.right, curr = None, curr.right
+                else:
+                    prev.right, curr = curr, curr.left
+
+    def _outputReverse(self, fromNode, toNode, result):
+        self._reverse(fromNode, toNode)
+        curr = toNode
+        while True:
+            result.append(curr.val)
+            if curr == fromNode: break
+            curr = curr.right
+        self._reverse(toNode, fromNode)
+
+    def _reverse(self, fromNode, toNode):
+        if fromNode == toNode: return
+        x, y, z = fromNode, fromNode.right, None
+        while True:
+            z = y.right
+            y.right = x
+            x = y
+            y = z
+            if x == toNode: break
+            
     def buildBST(self, node):   # build binary search tree by adding node
         if node.val < self.val:
             if not self.left:
@@ -259,12 +326,12 @@ class DLinkedList:
     def __len__(self):
         return self.size
 
-    def add(self, node):
+    def add(self, node):        # add in front
         node.prev, node.next = self.head, self.head.next
         node.next.prev = self.head.next = node
         self.size += 1
 
-    def pop(self, node=None):
+    def pop(self, node=None):   # pop from last if no given node
         if self.size == 0: return None
         self.size -= 1
         if not node: node = self.tail.prev
@@ -278,32 +345,32 @@ class DirectedGraphNode:        # for topological sorting
         self.outNodes = set()   # list or set or dictionary
 
 class DirectedGraph:
-    def __init__(self, nodes, edges):  # edges [(weight, u, v)]
+    def __init__(self, nodes, edges):   # edges [(weight, u, v)]
         self.graph = {}     # need to set up for all nodes. DON'T use defaultdict(list) based on edges
 
         for u in nodes:
-            self.graph[u] = self.graph.get(u, DirectedGraphNode())
+            self.graph[u] = DirectedGraphNode()
 
-        for weight, u, v in edges:
+        for weight, u, v in edges:      # u-->v
             if v not in self.graph[u].outNodes:
                 self.graph[u].outNodes.add(v)
                 self.graph[v].inEdges += 1
 
     def topologicalSort(self):
-        self.queue = deque()
+        queue = deque()                 # collect all starting nodes
         for u, dgNode in self.graph.items():
             if dgNode.inEdges == 0 :
-                self.queue.append(u)
+                queue.append(u)
 
         result = []
-        while self.queue:
-            u = self.queue.popleft()
+        while queue:
+            u = queue.popleft()
             result.append(u)
             for _ in range(len(self.graph[u].outNodes)):
                 v = self.graph[u].outNodes.pop()
                 self.graph[v].inEdges -= 1
                 if self.graph[v].inEdges == 0:
-                    self.queue.append(v)
+                    queue.append(v)
 
         return result
 
@@ -315,12 +382,12 @@ class UndirectedGraph:
             self.graph[u].append((weight,v))
             self.graph[v].append((weight,u))
 
-    # Prim algorithm is Dijkstra algorithm
-    def prim(self, nodeCount, start):      # for MST: minimum spanning tree
+    # Prim algorithm == Dijkstra algorithm
+    def prim(self, nodeCount, start):       # for MST: minimum spanning tree
         result = 0
         visit = set()
         minHeap = [(0, start)]
-        while len(visit) < nodeCount:   # while minHeap:
+        while len(visit) < nodeCount:       # while minHeap:
             weight, u = heappop(minHeap)
             if u in visit: continue
             result += weight
@@ -380,10 +447,14 @@ class Sort:
     def __init__(self, nums):
         self.nums = nums
 
+    def pivot(self, nums, start, end):
+        mid = (start + end) // 2
+        return sorted([nums[start], nums[mid], nums[end]])[1]
+        # return nums[random.randint(start,end)]
+
     def quickSort(self, nums, start, end):  # nums[start:end+1]
         if start >= end: return
-        pivotIndex = random.randint(start,end)
-        pivot = nums[pivotIndex]
+        pivot = self.pivot(nums, start, end)
         l, r = start, end
         while l <= r:
             while l <= r and nums[l] < pivot: l += 1
@@ -397,8 +468,7 @@ class Sort:
 
     def quickSelect(self, nums, start, end, k):     # select first k smallest nums
         if start >= end: return nums[:k]
-        pivotIndex = random.randint(start,end)
-        pivot = nums[pivotIndex]
+        pivot = self.pivot(nums, start, end)
         l, r = start, end
         while l <= r:
             while l <= r and nums[l] < pivot: l += 1
