@@ -622,4 +622,66 @@ class Match:    # string match pattern
 
         return result
 
+class MaxHeap:
+    def __init__(self, arr=None):
+        self._data = arr
+        
+        if len(self._data) > 1:
+            self._heapify()
+
+    def _heapify(self):
+        start = self._parent(len(self)-1)
+        for i in range(start, -1, -1):
+            self._downHeap(i)
+    
+    def __len__(self):
+        return len(self._data)
+
+    def _parent(self, i):
+        return (i-1)//2
+    
+    def _left(self, i):
+        return 2*i + 1
+    
+    def _right(self, i):
+        return 2*i + 2
+
+    def _hasLeft(self, i):
+        return self._left(i) < len(self._data)
+
+    def _hasRight(self, i):
+        return self._right(i) < len(self._data)
+
+    def _swap(self, i, j):
+        self._data[i], self._data[j] = self._data[j], self._data[i]
+
+    def _upHeap(self, i):
+        parent = self._parent(i)
+        if i > 0 and self._data[i] > self._data[parent]:    # change > to < for MinHeap
+            self._swap(i, parent)
+            self._upHeap(parent)
+
+    def _downHeap(self, i):
+        if self._hasLeft(i):
+            bigger_child = left = self._left(i)
+            if self._hasRight(i):
+                right = self._right(i)
+                if self._data[right] > self._data[left]:    # change > to < for MinHeap
+                    bigger_child = right
+            if self._data[bigger_child] > self._data[i]:    # change > to < for MinHeap
+                self._swap(i, bigger_child)
+                self._downHeap(bigger_child)
+
+    def push(self, val):
+        self._data.append(val)
+        self._upHeap(len(self)-1)
+
+    def pop(self):
+        if len(self) == 0:
+            raise IndexError("Heap is empty")
+        self._swap(0, len(self)-1)
+        val = self._data.pop()
+        self._downHeap(0)
+        return val
+
 print("Fan's Data Structures and Algorithms")
