@@ -130,7 +130,19 @@ class TreeNode:
             return self.right.buildBST(node)
         else:
             return False
-    
+
+    def predecessor(self, root):
+        node = root.left
+        while node.right:
+            node = node.right
+        return node.val
+
+    def successor(self, root):
+        node = root.right
+        while node.left:
+            node = node.left
+        return node.val
+
     def solve1(self, root):
         if not root: return -1 # or something
         # if func0(root): return something
