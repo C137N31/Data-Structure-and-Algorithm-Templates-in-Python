@@ -1,6 +1,7 @@
 from bisect import bisect_left, bisect_right
 from heapq import heappop, heappush
 from operator import itemgetter
+import sys
 from sortedcontainers import SortedList, SortedDict
 from collections import defaultdict, Counter, OrderedDict, deque
 from functools import lru_cache
@@ -394,8 +395,8 @@ class UndirectedGraph:
             self.graph[u].append((weight,v))
             self.graph[v].append((weight,u))
 
-    # Prim algorithm == Dijkstra algorithm
-    def prim(self, nodeCount, start):       # for MST: minimum spanning tree
+    # Prim algorithm : minimum total weights starting from any nodes
+    def Prim(self, nodeCount, start):       # for MST: minimum spanning tree
         result = 0
         visit = set()
         minHeap = [(0, start)]
@@ -408,7 +409,21 @@ class UndirectedGraph:
                 if v not in visit:
                     heappush(minHeap, (weight, v))
 
-    def kruskal(self, nodeCount, edges):    # edges [(weight, u, v)]
+    # Dijkstra algorithm: minimum path weights starting from given node to all other nodes
+    def Dijkstra(self, nodeCount, start):
+        pathWeight = [sys.maxsize] * nodeCount  # nodes: 0,1,2,...nodeCount-1
+        queue = deque([start])
+        pathWeight[start] = 0
+        while queue:
+            u = queue.popleft()
+            for weight, v in self.graph[u]:
+                newWeight = pathWeight[u] + weight
+                if pathWeight[v] > newWeight:
+                    pathWeight[v] = newWeight
+                    queue.append(v)
+        return max(pathWeight)
+
+    def Kruskal(self, nodeCount, edges):    # edges [(weight, u, v)]
         result = 0
         djs = DisjointSet(nodeCount)
         edges.sort()    # by weight
