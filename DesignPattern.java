@@ -28,13 +28,19 @@ public class VendingMachine {
 }
 
 public interface State {
-    public float selectItem(String selection) {}
-    public void insertCoins(List<Coin> coins) {}
-    public Pair<Item, List<Coin>> executeTransaction() {}
-    public List<Coin> cancelTransaction() {}
+    public float selectItem(String selection);
+    public void insertCoins(List<Coin> coins);
+    public Pair<Item, List<Coin>> executeTransaction();
+    public List<Coin> cancelTransaction();
 }
 
 public class HasSelectionState implements State {
+    VendingMachine vendingMachine = null;
+
+    public HasSelectionState(VendingMachine machine) {
+        vendingMachine = machine;
+    }
+
     public float selectItem(String selection) {}
     public void insertCoins(List<Coin> coins) {}
     public Pair<Item, List<Coin>> executeTransaction() {}
@@ -42,6 +48,12 @@ public class HasSelectionState implements State {
 }
 
 public class NoSelectionState implements State {
+    VendingMachine vendingMachine = null;
+
+    public NoSelectionState(VendingMachine machine) {
+        vendingMachine = machine;
+    }
+
     public float selectItem(String selection) {}
     public void insertCoins(List<Coin> coins) {}
     public Pair<Item, List<Coin>> executeTransaction() {}
@@ -49,6 +61,12 @@ public class NoSelectionState implements State {
 }
 
 public class SoldState implements State {
+    VendingMachine vendingMachine = null;
+
+    public SoldState(VendingMachine machine) {
+        vendingMachine = machine;
+    }
+
     public float selectItem(String selection) {}
     public void insertCoins(List<Coin> coins) {}
     public Pair<Item, List<Coin>> executeTransaction() {}
@@ -56,6 +74,12 @@ public class SoldState implements State {
 }
 
 public class SoldOutState implements State {
+    VendingMachine vendingMachine = null;
+
+    public SoldOutState(VendingMachine machine) {
+        vendingMachine = machine;
+    }
+
     public float selectItem(String selection) {}
     public void insertCoins(List<Coin> coins) {}
     public Pair<Item, List<Coin>> executeTransaction() {}
