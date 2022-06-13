@@ -123,11 +123,11 @@ public class StrategyFactory {
         else if (payment.getMethod().equals("credit card"))
             strategy = new CreditCardStrategy();
     }
-}
 
-public void pay(Payment payment) {
-    strategy = createStrategy(payment);
-    strategy.processPayment(payment);
+    public void pay(Payment payment) {
+        strategy = createStrategy(payment);
+        strategy.processPayment(payment);
+    }
 }
 
 // Decorator
